@@ -31,11 +31,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
 
 export default function BookingsPage() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const router = useRouter();
 
   const bookingsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -44,8 +47,28 @@ export default function BookingsPage() {
 
   const { data: bookings, isLoading, error } = useCollection<Booking>(bookingsQuery);
 
-  const upcomingBookings = bookings?.filter(b => b.status === 'Upcoming' && b.returnDateTime && (b.returnDateTime as any).toDate() >= new Date()) ?? [];
-  const pastBookings = bookings?.filter(b => b.status !== 'Upcoming' || !b.returnDateTime || (b.returnDateTime as any).toDate() < new Date()) ?? [];
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  const { upcomingBookings, pastBookings } = useMemo(() => {
+    if (!bookings) return { upcomingBookings: [], pastBookings: [] };
+
+    const now = new Date();
+    const allUserBookings = bookings.filter(b => b.userId === user?.uid);
+
+    const upcoming = allUserBookings.filter(b => {
+      return b.returnDateTime && (b.returnDateTime as any).toDate() >= now;
+    });
+
+    const past = allUserBookings.filter(b => {
+      return !b.returnDateTime || (b.returnDateTime as any).toDate() < now;
+    });
+
+    return { upcomingBookings: upcoming, pastBookings: past };
+  }, [bookings, user]);
 
   const handleCancelBooking = async (bookingId: string) => {
     if (!firestore) return;
@@ -64,6 +87,40 @@ export default function BookingsPage() {
       });
     }
   };
+  
+  if (isUserLoading || !user) {
+    return (
+       <div className="container mx-auto px-4 py-8 md:px-6">
+        <div className="flex items-center gap-4 mb-8">
+          <BookMarked className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">My Bookings</h1>
+            <p className="text-muted-foreground">View and manage your car rentals.</p>
+          </div>
+        </div>
+         <div className="space-y-12">
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle><Skeleton className="h-7 w-48"/></CardTitle>
+                    <CardDescription><Skeleton className="h-5 w-80"/></CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-24 w-full"/>
+                </CardContent>
+            </Card>
+             <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle><Skeleton className="h-7 w-48"/></CardTitle>
+                    <CardDescription><Skeleton className="h-5 w-80"/></CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-24 w-full"/>
+                </CardContent>
+            </Card>
+        </div>
+      </div>
+    );
+  }
 
 
   return (
@@ -71,8 +128,8 @@ export default function BookingsPage() {
       <div className="flex items-center gap-4 mb-8">
         <BookMarked className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">All Bookings</h1>
-          <p className="text-muted-foreground">View and manage all car rentals.</p>
+          <h1 className="text-3xl font-bold tracking-tight">My Bookings</h1>
+          <p className="text-muted-foreground">View and manage your car rentals.</p>
         </div>
       </div>
 
@@ -88,7 +145,7 @@ export default function BookingsPage() {
           <CardHeader>
             <CardTitle>Upcoming Rentals</CardTitle>
             <CardDescription>
-              These are all upcoming car rental reservations.
+              These are your upcoming car rental reservations.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -124,40 +181,38 @@ export default function BookingsPage() {
                       <Badge variant="default">{booking.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                       {user && user.uid === booking.userId && (
-                         <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
-                                <span className="sr-only">Cancel Booking</span>
-                             </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently cancel your booking for the <strong>{booking.vehicleName}</strong>.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Back</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => handleCancelBooking(booking.id)}
-                              >
-                                Cancel Booking
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                       )}
+                       <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Cancel Booking</span>
+                           </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently cancel your booking for the <strong>{booking.vehicleName}</strong>.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Back</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={() => handleCancelBooking(booking.id)}
+                            >
+                              Cancel Booking
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
                  {!isLoading && upcomingBookings.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center h-24">
-                      There are no upcoming bookings.
+                      You have no upcoming bookings.
                     </TableCell>
                   </TableRow>
                 )}
@@ -170,7 +225,7 @@ export default function BookingsPage() {
           <CardHeader>
             <CardTitle>Past Rentals</CardTitle>
             <CardDescription>
-              A history of all completed car rentals.
+              A history of all your completed car rentals.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -208,7 +263,7 @@ export default function BookingsPage() {
                  {!isLoading && pastBookings.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center h-24">
-                      There are no past bookings.
+                      You have no past bookings.
                     </TableCell>
                   </TableRow>
                 )}

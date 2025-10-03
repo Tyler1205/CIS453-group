@@ -2,6 +2,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { CarFront, Car, Truck, Caravan, Zap } from 'lucide-react';
 import type { Vehicle, Booking } from '@/lib/types';
 import type { ImagePlaceholder } from '@/lib/placeholder-images';
@@ -89,6 +90,7 @@ export function VehicleCard({ vehicle, imageData }: VehicleCardProps) {
 
   const handleBooking = async () => {
     if (!user) {
+      // This should ideally not be hit if the button logic is correct, but serves as a safeguard.
       router.push('/login');
       return;
     }
@@ -153,11 +155,30 @@ export function VehicleCard({ vehicle, imageData }: VehicleCardProps) {
   };
 
   const handleOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      setSelectedDate(undefined);
+    if (user) {
+      setIsDialogOpen(open);
+      if (!open) {
+        setSelectedDate(undefined);
+      }
+    } else {
+        router.push('/login');
     }
   };
+  
+  const BookButton = () => {
+    if (user) {
+        return (
+            <DialogTrigger asChild>
+                <Button>Book</Button>
+            </DialogTrigger>
+        )
+    }
+    return (
+        <Button asChild>
+            <Link href="/login">Book</Link>
+        </Button>
+    )
+  }
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -205,9 +226,7 @@ export function VehicleCard({ vehicle, imageData }: VehicleCardProps) {
           <span className="text-sm text-muted-foreground">/day</span>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-          <DialogTrigger asChild>
-            <Button>Book</Button>
-          </DialogTrigger>
+          <BookButton />
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Book: {vehicle.name}</DialogTitle>
