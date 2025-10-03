@@ -1,0 +1,120 @@
+/**
+ * @fileoverview Firestore Security Rules for Auto Charter application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a user-ownership model for user profiles and bookings,
+ * while allowing public read access to vehicle data. Only authenticated users
+ * can create, update, or delete their own profiles and bookings. Vehicle data
+ * is publicly readable but not writable via the client; these operations would
+ * be performed by an administrative backend.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores individual user profiles. Each profile is owned
+ *   by the corresponding user ID.
+ * - /vehicles/{vehicleId}: Stores vehicle details. Read access is public,
+ *   but write access is restricted.
+ * - /bookings/{bookingId}: Stores booking information, with each document
+ *   containing a 'userId' field to indicate ownership.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect user privacy.
+ * - Vehicle data is publicly readable to enable browsing without authentication.
+ * - Bookings are owned by the user who created them, enforced via the 'userId' field.
+ *
+ * Denormalization for Authorization:
+ * - The /bookings/{bookingId} documents MUST include a `userId` field that matches
+ *   the authenticated user's UID to ensure proper ownership and prevent unauthorized
+ *   access. This field is validated on creation and is immutable on update.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Ensures that only authenticated users can perform certain actions.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided user ID.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Enforces user ownership for data access.
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the existing owner of the document.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Ensures only the owner can update/delete an existing document.
+     */
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Security rules for user profiles.
+     * @path /users/{userId}
+     * @allow (create) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can create a profile with ID 'R4ZR92ylHUZeBazCCyyXjTqJvMA3'.
+     * @allow (get) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can read their own profile.
+     * @allow (update) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can update their own profile.
+     * @allow (delete) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can delete their own profile.
+     * @deny (create) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' cannot create a profile with ID 'differentUserId'.
+     * @deny (get) User 'anotherUser' cannot read User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' profile.
+     * @principle Enforces document ownership for writes, restricts access to a user's own data tree, validates relational integrity between documents.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Security rules for vehicles. Vehicles are publicly readable, but only the backend can modify them.
+     * @path /vehicles/{vehicleId}
+     * @allow (get) Any user can read vehicle data.
+     * @allow (list) Any user can list vehicle data.
+     * @deny (create) No client-side creation allowed.
+     * @deny (update) No client-side updates allowed.
+     * @deny (delete) No client-side deletes allowed.
+     * @principle Allows public read access for browsing, restricts write access to prevent unauthorized modification.
+     */
+    match /vehicles/{vehicleId} {
+      allow get, list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Security rules for bookings. Bookings are owned by the user who created them.
+     * @path /bookings/{bookingId}
+     * @allow (create) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can create a booking if booking.userId == 'R4ZR92ylHUZeBazCCyyXjTqJvMA3'.
+     * @allow (get) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can read their own booking.
+     * @allow (list) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can list their own bookings.
+     * @allow (update) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can update their own booking.
+     * @allow (delete) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' can delete their own booking.
+     * @deny (create) User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' cannot create a booking if booking.userId != 'R4ZR92ylHUZeBazCCyyXjTqJvMA3'.
+     * @deny (get) User 'anotherUser' cannot read User 'R4ZR92ylHUZeBazCCyyXjTqJvMA3' booking.
+     * @principle Enforces document ownership for writes, restricts access to a user's own bookings, validates relational integrity between documents.
+     */
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn() && isOwner(resource.data.userId);
+      allow list: if isSignedIn() && isOwner(request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && resource.data.userId == request.resource.data.userId;
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+  }
+}

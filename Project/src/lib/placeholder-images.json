@@ -1,0 +1,58 @@
+{
+  "placeholderImages": [
+    {
+      "id": "car1",
+      "description": "Sleek modern sedan on a city street",
+      "imageUrl": "https://images.unsplash.com/photo-1708908864299-47007b3cac4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzZWRhbiUyMGNpdHl8ZW58MHx8fHwxNzU5NTA2Nzc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sedan city"
+    },
+    {
+      "id": "car2",
+      "description": "Rugged SUV in a mountainous landscape",
+      "imageUrl": "https://images.unsplash.com/photo-1584849418394-359426ec6685?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzdXYlMjBtb3VudGFpbnxlbnwwfHx8fDE3NTk1MDY3Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suv mountain"
+    },
+    {
+      "id": "car3",
+      "description": "Large pickup truck at a construction site",
+      "imageUrl": "https://images.unsplash.com/photo-1707960190202-72087bace8cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0cnVjayUyMHdvcmt8ZW58MHx8fHwxNzU5NTA2Nzc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "truck work"
+    },
+    {
+      "id": "car4",
+      "description": "Spacious van parked near a scenic beach",
+      "imageUrl": "https://images.unsplash.com/photo-1656426672889-31d16c31f4de?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx2YW4lMjBiZWFjaHxlbnwwfHx8fDE3NTk1MDY3Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "van beach"
+    },
+    {
+      "id": "car5",
+      "description": "Compact car driving through a forest",
+      "imageUrl": "https://images.unsplash.com/photo-1750972821645-99913cd59abf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb21wYWN0JTIwY2FyfGVufDB8fHx8MTc1OTQ0MzIzNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "compact car"
+    },
+    {
+      "id": "car6",
+      "description": "Adventurous SUV on a dirt road",
+      "imageUrl": "https://images.unsplash.com/photo-1581472190630-a51ea012068b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzdXYlMjBkaXJ0fGVufDB8fHx8MTc1OTUwNjc3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "suv dirt"
+    },
+    {
+      "id": "car7",
+      "description": "Electric sedan charging in a modern city",
+      "imageUrl": "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxlbGVjdHJpYyUyMGNhcnxlbnwwfHx8fDE3NTk0MjYzMDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electric car"
+    },
+    {
+      "id": "car8",
+      "description": "Luxury SUV in front of a modern house",
+      "imageUrl": "https://images.unsplash.com/photo-1603223655355-5f1ff0462339?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxsdXh1cnklMjBzdXZ8ZW58MHx8fHwxNzU5NDI3MzU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "luxury suv"
+    },
+    {
+      "id": "car9",
+      "description": "Pickup truck in a rural setting",
+      "imageUrl": "https://images.unsplash.com/photo-1718784920427-0ef232a479d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0cnVjayUyMHJ1cmFsfGVufDB8fHx8MTc1OTUwNjc3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "truck rural"
+    }
+  ]
+}

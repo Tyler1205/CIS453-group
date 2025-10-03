@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile in the Auto Charter application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "Date and time the user registered.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "Vehicle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vehicle",
+      "type": "object",
+      "description": "Represents a vehicle available for rent.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Vehicle entity."
+        },
+        "make": {
+          "type": "string",
+          "description": "The make of the vehicle (e.g., Toyota)."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model of the vehicle (e.g., Camry)."
+        },
+        "year": {
+          "type": "number",
+          "description": "The year the vehicle was manufactured."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of vehicle (e.g., sedan, SUV)."
+        },
+        "licensePlate": {
+          "type": "string",
+          "description": "The license plate number of the vehicle."
+        },
+        "location": {
+          "type": "string",
+          "description": "The current location of the vehicle."
+        },
+        "availability": {
+          "type": "boolean",
+          "description": "Indicates if the vehicle is currently available for rent."
+        }
+      },
+      "required": [
+        "id",
+        "make",
+        "model",
+        "year",
+        "type",
+        "licensePlate",
+        "location",
+        "availability"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a rental booking made by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the booking."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who made the booking."
+        },
+        "vehicleId": {
+          "type": "string",
+          "description": "The ID of the vehicle that was booked."
+        },
+        "vehicleName": {
+          "type": "string",
+          "description": "The name of the vehicle."
+        },
+        "pickupDateTime": {
+          "type": "string",
+          "description": "The start date and time of the rental.",
+          "format": "date-time"
+        },
+        "returnDateTime": {
+          "type": "string",
+          "description": "The end date and time of the rental.",
+          "format": "date-time"
+        },
+        "bookingDate": {
+          "type": "string",
+          "description": "The date and time the booking was made.",
+          "format": "date-time"
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "The total cost of the rental."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the booking.",
+          "enum": [
+            "Upcoming",
+            "Completed",
+            "Cancelled"
+          ]
+        }
+      },
+      "required": [
+        "userId",
+        "vehicleId",
+        "vehicleName",
+        "pickupDateTime",
+        "returnDateTime",
+        "bookingDate",
+        "totalPrice",
+        "status"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores user profile information."
+    },
+    "/vehicles/{vehicleId}": {
+      "schema": {
+        "$ref": "#/entities/Vehicle"
+      },
+      "description": "Stores details about individual vehicles."
+    },
+    "/bookings/{bookingId}": {
+      "schema": {
+        "$ref": "#/entities/Booking"
+      },
+      "description": "Stores booking information. Contains a userId for security rules."
+    }
+  }
+}
