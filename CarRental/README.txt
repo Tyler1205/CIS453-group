@@ -9,4 +9,4 @@ Database: Firebase
 	* standard easy to use database
 
 Notes:
-ChatGPT is able to be used to make all code.
+ALL FOLLOWING CODE AND RELATED FILES HAVE BEEN CREATED BY AI

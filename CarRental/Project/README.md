@@ -1,3 +1,5 @@
+# ALL FOLLOWING CODE AND RELATED FILES HAVE BEEN CREATED BY AI
+
 # Firebase Studio
 
 This is a NextJS starter in Firebase Studio.
